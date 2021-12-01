@@ -20,23 +20,23 @@ type CustomError struct {
 
 //create a custom error
 func (err CustomClientErrorBody) Error() string {
-	var cE CustomError
-	return cE.Err.Error()
+	var customError CustomError
+	return customError.Err.Error()
 }
 
 //returns error struct as error
-func ErrMessageClient(cES []CustomError) error {
+func ErrMessageClient(customErrorArray []CustomError) error {
 	return CustomClientErrorBody{
 		TimeStamp:      time.Now().Format(time.RFC3339),
 		ErrorReference: uuid.New().String(),
-		Errors:         cES,
+		Errors:         customErrorArray,
 	}
 }
 
 //returns an array of error
-func ReturnErrorArray(cES []CustomError, code int, message, source string, err error) []CustomError{
+func ReturnErrorArray(customErrorArray []CustomError, code int, message, source string, err error) []CustomError{
 
-	cES = append(cES, CustomError{Code: code, Message: message, Source: source, Err: err})
+	customErrorArray = append(customErrorArray, CustomError{Code: code, Message: message, Source: source, Err: err})
 
-	return cES
+	return customErrorArray
 }
