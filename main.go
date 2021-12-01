@@ -8,27 +8,30 @@ import (
 	"net/http"
 )
 
-func repoSimulation() error {
+//function returns error
+func repo() error {
 	x := true
-	var cES []CustomErrors
+	var customErrorArray []CustomError
 	if x {
 		xr := errors.New("invalid")
-		cES = ErrArray(cES, 400, "wrong", "main", xr)
+		customErrorArray = ReturnErrorArray(customErrorArray, 400, "wrong", "main", xr)
 	}
 	if y := false; !y {
 		xr := errors.New("invalid")
-		cES = ErrArray(cES, 400, "wrong", "main", xr)
+		customErrorArray = ReturnErrorArray(customErrorArray, 400, "wrong", "main", xr)
 	}
-	fmt.Println(len(cES))
-	if len(cES) > 0 {
-		return ErrMessageClient(cES)
+	fmt.Println(len(customErrorArray))
+	if len(customErrorArray) > 0 {
+		return ErrMessageClient(customErrorArray)
 		
 	}
 	return nil
 }
+
+//handles error responses
 func ResponseError(rw http.ResponseWriter, err error) {
 	rw.Header().Set("Content-Type", "Application/json")
-	var ew CustomClientError
+	var ew CustomClientErrorBody
 	if errors.As(err, &ew) {
 		rw.WriteHeader(404)
 		for _, val := range ew.Errors {
@@ -37,7 +40,10 @@ func ResponseError(rw http.ResponseWriter, err error) {
 		_ = json.NewEncoder(rw).Encode(ew)
 		return
 	}
-	// handle non CustomErrorWrapper types
+
+	// handles non CustomErrorWrapper types
+	//structure in progress
+	//this works for now
 	rw.WriteHeader(500)
 	log.Println(err.Error())
 	_ = json.NewEncoder(rw).Encode(map[string]interface{}{
@@ -45,6 +51,7 @@ func ResponseError(rw http.ResponseWriter, err error) {
 	})
 }
 
+//handles success responses
 func ResponseSuccess(rw http.ResponseWriter, data interface{}) {
 	rw.Header().Set("Content-Type", "Application/json")
 	body := map[string]interface{}{
@@ -53,8 +60,9 @@ func ResponseSuccess(rw http.ResponseWriter, data interface{}) {
 	_ = json.NewEncoder(rw).Encode(body)
 }
 
+//http handler
 func handler(rw http.ResponseWriter, r *http.Request) {
-	err := repoSimulation()
+	err := repo()
 	if err != nil {
 		ResponseError(rw, err)
 		return
